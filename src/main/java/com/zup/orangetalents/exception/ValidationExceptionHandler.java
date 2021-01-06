@@ -1,32 +1,43 @@
 package com.zup.orangetalents.exception;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.zup.orangetalents.jsonapi.JsonApiError;
+import com.zup.orangetalents.jsonapi.JsonApiErrorResponse;
+
 @ControllerAdvice 
 public class ValidationExceptionHandler {
 	
+	private static final String TITLE_ERROR = "Validation Error";
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> handlerMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-		List<FieldError> errors = exception.getBindingResult().getFieldErrors();
-		Set<ErrorDetails> x = new HashSet<ErrorDetails>();
 		
-		for(FieldError error: errors) {
-			String details = error.getDefaultMessage();
-			x.add(new ErrorDetails(HttpStatus.BAD_REQUEST.toString(), 
-									"Validation Error", 
-									String.format(details, error.getRejectedValue()), 
-									error.getField()));
-		}							
-		return new ResponseEntity<>(x, HttpStatus.BAD_REQUEST);
+		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+		Set<JsonApiError> errors = new HashSet<JsonApiError>();
+		
+		for(FieldError error: fieldErrors) {
+			String errorDetails = String.format(error.getDefaultMessage(), error.getRejectedValue());
+			String fieldName = error.getField();
+			
+			JsonApiError jsonApiError = new JsonApiError()
+											.withStatus(BAD_REQUEST.toString())
+											.withTitle(TITLE_ERROR)
+											.withDetails(errorDetails)
+											.withFieldName(fieldName);
+			errors.add(jsonApiError);
+		}
+		JsonApiErrorResponse<JsonApiError> jsonApiErrorObject = new JsonApiErrorResponse<JsonApiError>(errors);
+		return new ResponseEntity<>(jsonApiErrorObject, BAD_REQUEST);
 	}
-
 }
