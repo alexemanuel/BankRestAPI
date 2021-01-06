@@ -1,7 +1,9 @@
 package com.zup.orangetalents.exception;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
@@ -12,6 +14,8 @@ public class ErrorDetails {
 	private String status;
 	private String title;
 	private String details;
+	
+	@JsonIgnore
 	private String fieldName;
 	
 	@Override
