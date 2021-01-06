@@ -25,7 +25,7 @@ public class ValidationExceptionHandler {
 									"Validation Error", 
 									String.format(details, error.getRejectedValue()), 
 									error.getField()));
-		}	
+		}							
 		return new ResponseEntity<>(x, HttpStatus.BAD_REQUEST);
 	}
 
