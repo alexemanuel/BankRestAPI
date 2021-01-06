@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,6 +26,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(name = "accounts", uniqueConstraints = {
+		@UniqueConstraint(name = "accounts_unique_email", columnNames = {"email"}),
+		@UniqueConstraint(name = "accounts_unique_cpf",   columnNames = {"cpf"})})
 public class Account {
 	
 	@Id
