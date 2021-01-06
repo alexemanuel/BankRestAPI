@@ -47,7 +47,7 @@ public class Account {
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'hh:mm:ss.SSSZ")
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Past(message = "Birth Date must be before the current date")
-	private Date birthData;
+	private Date birthDate;
 	
 	public Account() {}
 }
