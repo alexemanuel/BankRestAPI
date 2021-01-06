@@ -7,13 +7,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -30,7 +32,7 @@ public class Account {
 	private long id;
 	
 	@NotBlank(message = "Name must not be blank")
-	@Min(value = 5, message = "Name must be at least 5 characters")
+	@Size(min = 5, message = "Name must have at least 5 characters")
 	private String name;
 	
 	@NotBlank(message = "Email must have a value")
@@ -41,8 +43,9 @@ public class Account {
 	@CPF(message = "Invalid CPF. Try again with a valid CPF")
 	private String cpf;
 	
-	@NotBlank(message = "Birth Date must not be blank")
+	@NotNull(message = "Birth Date must not be blank")
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'hh:mm:ss.SSSZ")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Past(message = "Birth Date must be before the current date")
 	private Date birthData;
 	
