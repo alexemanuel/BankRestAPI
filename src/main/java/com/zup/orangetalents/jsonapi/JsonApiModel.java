@@ -13,8 +13,8 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonPropertyOrder({"version", "timestamp", "data"})
-public class JsonApiModel extends JsonApiResponseTemplate{
-	private JsonApiData<?> data;
+public class JsonApiModel<T> extends JsonApiResponseTemplate{
+	private T data;
 }
 
 
