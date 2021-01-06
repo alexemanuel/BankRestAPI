@@ -32,21 +32,21 @@ public class Account {
 	private long id;
 	
 	@NotBlank(message = "Name must not be blank")
-	@Size(min = 5, message = "Name must have at least 5 characters")
+	@Size(min = 5, message = "Name (%s) must have at least 5 characters")
 	private String name;
 	
-	@NotBlank(message = "Email must have a value")
-	@Email(message = "Invalid Email format. Email must follow the formatter **@** ")
+	@NotBlank(message = "Email must not be blank")
+	@Email(message = "Invalid Email format. Email (%s) must follow the format **@**")
 	private String email;
-	
+
 	@NotBlank(message = "CPF must not be blank")
-	@CPF(message = "Invalid CPF. Try again with a valid CPF")
+	@CPF(message = "CPF number (%s) is invalid. Try again with a valid CPF")
 	private String cpf;
 	
 	@NotNull(message = "Birth Date must not be blank")
-	@DateTimeFormat(pattern = "yyyy-MM-dd'T'hh:mm:ss.SSSZ")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	@Past(message = "Birth Date must be before the current date")
+	@Past(message = "Birth Date (%s) must be before the current date")
 	private Date birthDate;
 	
 	public Account() {}
