@@ -1,5 +1,8 @@
 package com.zup.orangetalents.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zup.orangetalents.jsonapi.JsonApiData;
+import com.zup.orangetalents.jsonapi.JsonApiModel;
 import com.zup.orangetalents.model.Account;
 import com.zup.orangetalents.repository.AccountRepository;
 
@@ -21,7 +26,18 @@ public class AccountController {
 	AccountRepository accountRepository;
 	
 	@PostMapping
-	public Account createAccount(@Valid @RequestBody Account account) {
-		return accountRepository.save(account);
+	public ResponseEntity<JsonApiModel> createAccount(@Valid @RequestBody Account account) {
+		Account registredAccount = accountRepository.save(account);
+		
+		JsonApiData<Account> jsonApiData = new JsonApiData<Account>()
+				.withAttributes(registredAccount)
+				.withId(String.valueOf(registredAccount.getId()))
+				.withType("accounts")
+				.withLink(linkTo(methodOn(AccountController.class).createAccount(account)).withSelfRel())
+				.withLink(linkTo(methodOn(AccountController.class).createAccount(account)).withSelfRel());
+		
+		JsonApiModel jsonApiModel = new JsonApiModel(jsonApiData);
+		
+		return new ResponseEntity<JsonApiModel>(jsonApiModel, HttpStatus.CREATED);
 	}
 }
