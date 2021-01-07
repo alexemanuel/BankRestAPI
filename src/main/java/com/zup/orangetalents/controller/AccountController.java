@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,7 @@ public class AccountController {
 	AccountRepository accountRepository;
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getAccount(@PathVariable(value = "id") long id) {
+	public ResponseEntity<?> getAccount(@PathVariable long id) {
 		Account account = accountRepository.findById(id)
 												.orElseThrow(() -> new AccountNotFoundException(id));
 			
@@ -43,7 +44,7 @@ public class AccountController {
 				.withId(id)
 				.withType("accounts")
 				.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withSelfRel())
-				.withLink(linkTo(methodOn(AccountController.class).getAllAccounts()).withRel("Accounts"));
+				.withLink(linkTo(methodOn(AccountController.class).getAllAccounts()).withRel("accounts"));
 		
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
 		
@@ -63,7 +64,6 @@ public class AccountController {
 						.withId(id)
 						.withType("accounts")
 						.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withSelfRel());
-				
 			}).collect(Collectors.toList());
 		
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
@@ -80,8 +80,8 @@ public class AccountController {
 				.withAttributes(registredAccount)
 				.withId(id)
 				.withType("accounts")
-				.withLink(linkTo(methodOn(AccountController.class).createAccount(account)).withSelfRel())
-				.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withRel("Account"));
+				.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withSelfRel())
+				.withLink(linkTo(methodOn(AccountController.class).getAllAccounts()).withRel("accounts"));
 		
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
 		
@@ -89,10 +89,21 @@ public class AccountController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteAccount(@PathVariable(value = "id") long id) {
+	public ResponseEntity<?> deleteAccount(@PathVariable long id) {
 		accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
 		accountRepository.deleteById(id);
 														
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updataAccount(@Valid @PathVariable long id, @RequestBody Account account) {
+		accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
+
+		// Update the old Account object with a new Account object with the same ID.
+		account.setId(id);
+		accountRepository.save(account);
+		
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
