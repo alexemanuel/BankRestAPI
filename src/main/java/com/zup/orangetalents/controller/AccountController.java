@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,10 +33,10 @@ public class AccountController {
 	@Autowired
 	AccountRepository accountRepository;
 	
-	@GetMapping("{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<?> getAccount(@PathVariable(value = "id") long id) {
-		Account account = accountRepository.findById(id).
-										orElseThrow(() -> new AccountNotFoundException(id));
+		Account account = accountRepository.findById(id)
+												.orElseThrow(() -> new AccountNotFoundException(id));
 			
 		JsonApiData<Account> jsonApiData = new JsonApiData<Account>()
 				.withAttributes(account)
@@ -69,7 +70,6 @@ public class AccountController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(jsonApiModel);
 	}
-	
 
 	@PostMapping
 	public ResponseEntity<?> createAccount(@Valid @RequestBody Account account) {
@@ -86,5 +86,13 @@ public class AccountController {
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(jsonApiModel);
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteAccount(@PathVariable(value = "id") long id) {
+		accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
+		accountRepository.deleteById(id);
+														
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 	}
 }
