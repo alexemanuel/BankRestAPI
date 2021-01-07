@@ -1,4 +1,4 @@
-package com.zup.orangetalents.exception;
+package com.zup.orangetalents.exception.handler;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
 

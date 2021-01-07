@@ -1,4 +1,4 @@
-package com.zup.orangetalents.exception;
+package com.zup.orangetalents.exception.handler;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -24,6 +24,7 @@ public class ValidationExceptionHandler {
 	public ResponseEntity<?> handlerMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
 		
 		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+		// Using a Set we guarantee that there will be only one error for field
 		Set<JsonApiError> errors = new HashSet<JsonApiError>();
 		
 		for(FieldError error: fieldErrors) {

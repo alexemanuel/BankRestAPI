@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zup.orangetalents.exception.AccountNotFoundException;
 import com.zup.orangetalents.jsonapi.JsonApiData;
 import com.zup.orangetalents.jsonapi.JsonApiModel;
 import com.zup.orangetalents.model.Account;
@@ -33,30 +34,35 @@ public class AccountController {
 	
 	@GetMapping("{id}")
 	public ResponseEntity<?> getAccount(@PathVariable(value = "id") long id) {
-		Account account = accountRepository.findById(id).get();
+		Account account = accountRepository.findById(id).
+										orElseThrow(() -> new AccountNotFoundException(id));
 			
 		JsonApiData<Account> jsonApiData = new JsonApiData<Account>()
 				.withAttributes(account)
-				.withId(String.valueOf(id))
+				.withId(id)
 				.withType("accounts")
 				.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withSelfRel())
 				.withLink(linkTo(methodOn(AccountController.class).getAllAccounts()).withRel("Accounts"));
 		
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
+		
 		return ResponseEntity.status(HttpStatus.OK).body(jsonApiModel);		
 	}
 	
-	@GetMapping()
+	@GetMapping
 	public ResponseEntity<?> getAllAccounts() {
 		List<Account> accounts = accountRepository.findAll();		
 		
 		List<JsonApiData<Account>> jsonApiData = StreamSupport.stream(accounts.spliterator(), false)
 			.map(account -> {
+				long id = account.getId();
+				
 				return new JsonApiData<Account>()
 						.withAttributes(account)
-						.withId(String.valueOf(account.getId()))
+						.withId(id)
 						.withType("accounts")
-						.withLink(linkTo(methodOn(AccountController.class).getAccount(account.getId())).withSelfRel());
+						.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withSelfRel());
+				
 			}).collect(Collectors.toList());
 		
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
@@ -68,14 +74,14 @@ public class AccountController {
 	@PostMapping
 	public ResponseEntity<?> createAccount(@Valid @RequestBody Account account) {
 		Account registredAccount = accountRepository.save(account);
-		long accountId = registredAccount.getId();
+		long id = registredAccount.getId();
 		
 		JsonApiData<Account> jsonApiData = new JsonApiData<Account>()
 				.withAttributes(registredAccount)
-				.withId(String.valueOf(accountId))
+				.withId(id)
 				.withType("accounts")
 				.withLink(linkTo(methodOn(AccountController.class).createAccount(account)).withSelfRel())
-				.withLink(linkTo(methodOn(AccountController.class).getAccount(accountId)).withRel("Account"));
+				.withLink(linkTo(methodOn(AccountController.class).getAccount(id)).withRel("Account"));
 		
 		JsonApiModel<?> jsonApiModel = new JsonApiModel<>(jsonApiData);
 		

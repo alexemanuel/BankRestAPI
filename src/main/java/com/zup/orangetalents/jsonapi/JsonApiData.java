@@ -21,7 +21,7 @@ import lombok.With;
 public class JsonApiData<T> {
  
 	// String that identify uniquely that resource type
-	private String id;
+	private Object id;
 	// The resource category
 	private String type;
 	// A list of links object containing links related to the resource.
