@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+
+  api:
+    build:
+      context: "."
+      dockerfile: Dockerfile-BankRestAPI
+    container_name: api-container
+    environment:
+      DATABASE_USERNAME: ${DB_USERNAME}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_URL: jdbc:postgresql://${DB_ALIAS}:5432/${DB_USERNAME}
+    ports:
+      - 8080:8080
+    volumes:
+      - "../BankRestAPI:/home/api"
+    links:
+      - db:${DB_ALIAS}
+
+  db:
+    image: postgres:12
+    container_name: postgres-container
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata 
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - "./database_volume:/var/lib/postgresql/data"
+   
